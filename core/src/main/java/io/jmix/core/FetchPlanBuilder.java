@@ -64,7 +64,8 @@ public class FetchPlanBuilder {
     }
 
     public FetchPlan build() {
-        FetchPlan fetchPlan = new FetchPlan(metaClass.getJavaClass(), systemProperties);
+        FetchPlan fetchPlan = createFetchPlan();
+        if (systemProperties) fetchPlan.addSystemProperties();
         for (String property : properties) {
             FetchPlanBuilder builder = builders.get(property);
             if (builder == null) {
@@ -84,6 +85,10 @@ public class FetchPlanBuilder {
             }
         }
         return fetchPlan;
+    }
+
+    protected FetchPlan createFetchPlan() {
+        return new FetchPlan(metaClass.getJavaClass());
     }
 
     public FetchPlanBuilder add(String property) {
@@ -140,7 +145,7 @@ public class FetchPlanBuilder {
         this.systemProperties = true;
         return this;
     }
-    
+
     public FetchPlanBuilder addFetchPlan(FetchPlan fetchPlan) {
         for (FetchPlanProperty property : fetchPlan.getProperties()) {
             properties.add(property.getName());

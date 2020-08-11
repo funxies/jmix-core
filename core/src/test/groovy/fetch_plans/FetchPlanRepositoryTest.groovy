@@ -16,9 +16,7 @@
 
 package fetch_plans
 
-import io.jmix.core.CoreConfiguration
-import io.jmix.core.FetchPlan
-import io.jmix.core.FetchPlanRepository
+import io.jmix.core.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.TestExecutionListeners
@@ -39,6 +37,12 @@ class FetchPlanRepositoryTest extends Specification {
     @Autowired
     FetchPlanRepository repository
 
+    @Autowired
+    MetadataTools metadataTools
+
+    @Autowired
+    Metadata metadata
+
     def "fetchPlan is deployed from add-on's fetch-plans.xml file"() {
 
         when:
@@ -50,7 +54,7 @@ class FetchPlanRepositoryTest extends Specification {
         fetchPlan.containsProperty('name')
     }
 
-    def "predefined fetch plans do not contain system properties"() {
+    def "predefined fetch plans contain local system properties"() {
 
         given:
 
@@ -58,17 +62,13 @@ class FetchPlanRepositoryTest extends Specification {
 
         expect:
 
-        !containsSystemProperties(localFetchPlan)
+        containsSystemProperties(localFetchPlan)
 
     }
 
     private boolean containsSystemProperties(FetchPlan fetchPlan) {
 
-        def systemProperties = [
-                "id",
-                "version"
-        ]
-
+        def systemProperties = metadataTools.getSystemProperties(metadata.getClass(fetchPlan.getEntityClass()))
         systemProperties.any { systemProperty -> fetchPlan.containsProperty(systemProperty) }
     }
 }

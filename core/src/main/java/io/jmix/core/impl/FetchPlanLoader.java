@@ -26,10 +26,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nullable;
-import org.springframework.beans.factory.annotation.Autowired;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -147,7 +147,7 @@ public class FetchPlanLoader {
                 throw new RuntimeException("cannot find range for meta property: " + metaProperty);
             }
 
-            final List<Element> propertyElements = propElem.elements("property");;
+            final List<Element> propertyElements = propElem.elements("property");
             boolean inlineFetchPlan = !propertyElements.isEmpty();
 
             if (!range.isClass() && (refFetchPlanName != null || inlineFetchPlan)) {
@@ -165,13 +165,18 @@ public class FetchPlanLoader {
                 Class<? extends JmixEntity> rangeClass = range.asClass().getJavaClass();
 
                 if (refFetchPlan != null) {
-                    refFetchPlan = new FetchPlan(refFetchPlan, rangeClass, "", false); // system properties are already in the source fetch plan
+                    refFetchPlan = new FetchPlan(refFetchPlan, rangeClass, ""); // system properties are already in the source fetch plan
                 } else {
                     FetchPlanProperty existingProperty = fetchPlan.getProperty(propertyName);
                     if (existingProperty != null && existingProperty.getFetchPlan() != null) {
-                        refFetchPlan = new FetchPlan(existingProperty.getFetchPlan(), rangeClass, "", systemProperties);
+                        refFetchPlan = new FetchPlan(new FetchPlan.FetchPlanParams()
+                                .src(existingProperty.getFetchPlan())
+                                .entityClass(rangeClass)
+                                .includeSystemProperties(systemProperties));
                     } else {
-                        refFetchPlan = new FetchPlan(rangeClass, systemProperties);
+                        refFetchPlan = new FetchPlan(new FetchPlan.FetchPlanParams()
+                                .entityClass(rangeClass)
+                                .includeSystemProperties(systemProperties));
                     }
                 }
                 loadFetchPlanProperties(propElem, refFetchPlan, systemProperties, refFetchPlanResolver);

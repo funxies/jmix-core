@@ -391,8 +391,7 @@ public class EntityStates {
      */
     public FetchPlan getCurrentFetchPlan(JmixEntity entity) {
         checkNotNullArgument(entity);
-
-        FetchPlan fetchPlan = new FetchPlan(entity.getClass(), false);
+        FetchPlan fetchPlan = new FetchPlan(entity.getClass());
         recursivelyGetCurrentFetchPlan(entity, fetchPlan, new HashSet<>());
         return fetchPlan;
     }

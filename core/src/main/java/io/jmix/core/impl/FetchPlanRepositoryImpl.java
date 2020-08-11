@@ -257,13 +257,13 @@ public class FetchPlanRepositoryImpl implements FetchPlanRepository {
 
         FetchPlan fetchPlan;
         if (FetchPlan.LOCAL.equals(name)) {
-            fetchPlan = new FetchPlan(javaClass, name, false);
+            fetchPlan = new FetchPlan(javaClass, name);
             addAttributesToLocalFetchPlan(metaClass, fetchPlan);
         } else if (FetchPlan.INSTANCE_NAME.equals(name)) {
-            fetchPlan = new FetchPlan(javaClass, name, false);
+            fetchPlan = new FetchPlan(javaClass, name);
             addAttributesToInstanceNameFetchPlan(metaClass, fetchPlan, info, visited);
         } else if (FetchPlan.BASE.equals(name)) {
-            fetchPlan = new FetchPlan(javaClass, name, false);
+            fetchPlan = new FetchPlan(javaClass, name);
             addAttributesToInstanceNameFetchPlan(metaClass, fetchPlan, info, visited);
             addAttributesToLocalFetchPlan(metaClass, fetchPlan);
         } else {
@@ -278,7 +278,6 @@ public class FetchPlanRepositoryImpl implements FetchPlanRepository {
     protected void addAttributesToLocalFetchPlan(MetaClass metaClass, FetchPlan fetchPlan) {
         for (MetaProperty property : metaClass.getProperties()) {
             if (!property.getRange().isClass()
-                    && !metadataTools.isSystem(property)
                     && metadataTools.isPersistent(property)) {
                 fetchPlan.addProperty(property.getName());
             }

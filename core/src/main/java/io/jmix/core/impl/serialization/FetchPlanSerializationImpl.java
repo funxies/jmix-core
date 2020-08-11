@@ -23,10 +23,10 @@ import io.jmix.core.metamodel.model.MetaProperty;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nullable;
-import org.springframework.beans.factory.annotation.Autowired;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -165,7 +165,7 @@ public class FetchPlanSerializationImpl implements FetchPlanSerialization {
             if (metaClass == null) {
                 throw new FetchPlanSerializationException(String.format("Entity with name %s not found", entityName));
             }
-            FetchPlan view = new FetchPlan(metaClass.getJavaClass(), viewName, false);
+            FetchPlan view = new FetchPlan(metaClass.getJavaClass(), viewName);
             fillViewProperties(view, properties, metaClass);
             return view;
         }
@@ -208,10 +208,10 @@ public class FetchPlanSerializationImpl implements FetchPlanSerialization {
                             FetchPlan nestedView;
                             JsonPrimitive viewNamePrimitive = nestedViewObject.getAsJsonPrimitive("name");
                             if (viewNamePrimitive != null) {
-                                nestedView = new FetchPlan(nestedViewEntityClass, viewNamePrimitive.getAsString(), false);
+                                nestedView = new FetchPlan(nestedViewEntityClass, viewNamePrimitive.getAsString());
                                 processedViews.add(nestedView);
                             } else {
-                                nestedView = new FetchPlan(nestedViewEntityClass, false);
+                                nestedView = new FetchPlan(nestedViewEntityClass);
                             }
                             JsonArray nestedProperties = nestedViewObject.getAsJsonArray("properties");
                             fillViewProperties(nestedView, nestedProperties, nestedViewMetaClass);

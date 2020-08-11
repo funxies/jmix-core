@@ -16,10 +16,7 @@
 
 package fetch_plan_builder;
 
-import io.jmix.core.CoreConfiguration;
-import io.jmix.core.FetchPlan;
-import io.jmix.core.FetchPlanProperty;
-import io.jmix.core.FetchPlans;
+import io.jmix.core.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +29,8 @@ import test_support.app.TestAppConfiguration;
 import test_support.app.entity.Owner;
 import test_support.app.entity.Pet;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
@@ -41,7 +40,13 @@ import static org.junit.jupiter.api.Assertions.*;
 public class FetchPlanBuilderTest {
 
     @Autowired
-    FetchPlans fetchPlans;
+    private FetchPlans fetchPlans;
+
+    @Autowired
+    private MetadataTools metadataTools;
+
+    @Autowired
+    private Metadata metadata;
 
     @Test
     public void testBuild() {
@@ -114,7 +119,7 @@ public class FetchPlanBuilderTest {
         assertNotNull(view.getProperty("owner"));
         FetchPlan ownerView = view.getProperty("owner").getFetchPlan();
         assertNotNull(ownerView);
-        assertFalse(containsSystemProperties(ownerView));
+        assertTrue(containsSystemProperties(ownerView));
         assertTrue(ownerView.containsProperty("name"));
         assertFalse(ownerView.containsProperty("address"));
     }
@@ -152,11 +157,11 @@ public class FetchPlanBuilderTest {
     public void testLocal() {
         FetchPlan petView = fetchPlans.builder(Pet.class).addFetchPlan(FetchPlan.LOCAL).build();
 
-        assertFalse(containsSystemProperties(petView));
+        assertTrue(containsSystemProperties(petView));
         assertTrue(petView.containsProperty("name"));
 
         FetchPlan ownerView = fetchPlans.builder(Owner.class).addFetchPlan(FetchPlan.LOCAL).build();
-        assertFalse(containsSystemProperties(ownerView));
+        assertTrue(containsSystemProperties(ownerView));
         assertTrue(ownerView.containsProperty("name"));
         assertFalse(ownerView.containsProperty("address"));
     }
@@ -165,7 +170,7 @@ public class FetchPlanBuilderTest {
     public void testBase() {
         FetchPlan view = fetchPlans.builder(Pet.class).addFetchPlan(FetchPlan.BASE).build();
 
-        assertFalse(containsSystemProperties(view));
+        assertTrue(containsSystemProperties(view));
         assertTrue(view.containsProperty("name"));
     }
 
@@ -176,7 +181,7 @@ public class FetchPlanBuilderTest {
                 .add("owner")
                 .build();
 
-        assertFalse(containsSystemProperties(view));
+        assertTrue(containsSystemProperties(view));
         assertTrue(view.containsProperty("name"));
 
         assertNotNull(view.getProperty("owner"));
@@ -192,7 +197,7 @@ public class FetchPlanBuilderTest {
                 .add("owner.address.city")
                 .build();
 
-        assertFalse(containsSystemProperties(view));
+        assertTrue(containsSystemProperties(view));
         assertTrue(view.containsProperty("name"));
 
         assertNotNull(view.getProperty("owner"));
@@ -223,8 +228,8 @@ public class FetchPlanBuilderTest {
     }
 
     private boolean containsSystemProperties(FetchPlan view) {
-        return view.containsProperty("id")
-                && view.containsProperty("version");
+        List<String> systemProperties = metadataTools.getSystemProperties(metadata.getClass(view.getEntityClass()));
+        return systemProperties.stream().allMatch(view::containsProperty);
     }
 
 }

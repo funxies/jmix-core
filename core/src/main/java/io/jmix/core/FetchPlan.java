@@ -16,9 +16,7 @@
 package io.jmix.core;
 
 import io.jmix.core.common.util.Preconditions;
-import io.jmix.core.entity.Versioned;
 import io.jmix.core.metamodel.model.MetaClass;
-import io.jmix.core.metamodel.model.MetaProperty;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
@@ -82,7 +80,7 @@ public class FetchPlan implements Serializable {
     }
 
     /**
-     * Includes all local non-system properties.
+     * Includes all local properties.
      */
     public static final String LOCAL = "_local";
 
@@ -92,7 +90,7 @@ public class FetchPlan implements Serializable {
     public static final String INSTANCE_NAME = "_instance_name";
 
     /**
-     * Includes all local non-system properties and properties defined by {@link io.jmix.core.metamodel.annotation.InstanceName}
+     * Includes all local and properties defined by {@link io.jmix.core.metamodel.annotation.InstanceName}
      * (effectively {@link #INSTANCE_NAME} + {@link #LOCAL}).
      */
     public static final String BASE = "_base";
@@ -108,44 +106,29 @@ public class FetchPlan implements Serializable {
     private boolean loadPartialEntities;
 
     public FetchPlan(Class<? extends JmixEntity> entityClass) {
-        this(entityClass, "", true);
-    }
-
-    public FetchPlan(Class<? extends JmixEntity> entityClass, boolean includeSystemProperties) {
-        this(entityClass, "", includeSystemProperties);
+        this(entityClass, "");
     }
 
     public FetchPlan(Class<? extends JmixEntity> entityClass, String name) {
-        this(entityClass, name, true);
-    }
-
-    public FetchPlan(Class<? extends JmixEntity> entityClass, String name, boolean includeSystemProperties) {
         this(new FetchPlanParams().entityClass(entityClass)
-                .name(name)
-                .includeSystemProperties(includeSystemProperties)
-        );
+                .name(name));
     }
 
-    public FetchPlan(FetchPlan src, String name, boolean includeSystemProperties) {
-        this(src, null, name, includeSystemProperties);
+    public FetchPlan(FetchPlan src, String name) {
+        this(src, null, name);
     }
 
-    public FetchPlan(FetchPlan src, @Nullable Class<? extends JmixEntity> entityClass, String name, boolean includeSystemProperties) {
+    public FetchPlan(FetchPlan src, @Nullable Class<? extends JmixEntity> entityClass, String name) {
         this(new FetchPlanParams().src(src)
                 .entityClass(entityClass != null ? entityClass : src.entityClass)
                 .name(name)
-                .includeSystemProperties(includeSystemProperties)
         );
     }
 
-    public FetchPlan(FetchPlanParams viewParams) {
+    public FetchPlan(FetchPlanParams viewParams) {//todo taimanov rework and use builder
         this.entityClass = viewParams.entityClass;
         this.name = viewParams.name != null ? viewParams.name : "";
-        if (viewParams.includeSystemProperties) {
-            for (String propertyName : findSystemProperties(entityClass)) {
-                addProperty(propertyName);
-            }
-        }
+        prepareView(viewParams.includeSystemProperties);
         List<FetchPlan> sources = viewParams.src;
 
         if (isNotEmpty(sources)) {
@@ -330,33 +313,19 @@ public class FetchPlan implements Serializable {
         return this;
     }
 
-    protected Set<String> findSystemProperties(Class entityClass) {
-        Set<String> result = new LinkedHashSet<>();
-
-        Metadata metadata = AppBeans.get(Metadata.NAME);
-        MetadataTools metadataTools = AppBeans.get(MetadataTools.NAME);
-        MetaClass metaClass = metadata.getClass(entityClass);
-
-        String pkName = metadataTools.getPrimaryKeyName(metaClass);
-        if (pkName != null) {
-            result.add(pkName);
-        }
-
-        addSystemPropertiesFrom(Versioned.class, entityClass, metaClass, metadataTools, result);
-
-        return result;
+    protected void prepareView(boolean includeSystemProperties) {
+        if (includeSystemProperties)
+            addSystemProperties();
     }
 
-    protected void addSystemPropertiesFrom(Class<?> baseClass, Class<?> entityClass, MetaClass metaClass,
-                                           MetadataTools metadataTools, Set<String> result) {
-        if (baseClass.isAssignableFrom(entityClass)) {
-            for (String property : getInterfaceProperties(baseClass)) {
-                MetaProperty metaProperty = metaClass.findProperty(property);
-                if (metaProperty != null && metadataTools.isPersistent(metaProperty)) {
-                    result.add(property);
-                }
-            }
+    public FetchPlan addSystemProperties() {//todo taimanov get rid of this after FetchPlan/Builder refactor
+        Metadata metadata = AppBeans.get(Metadata.NAME);
+        MetadataTools metadataTools = AppBeans.get(MetadataTools.NAME);
+        MetaClass metaClass = metadata.getClass(getEntityClass());
+        for (String propertyName : metadataTools.getSystemProperties(metaClass)) {
+            addProperty(propertyName);
         }
+        return this;
     }
 
     protected List<String> getInterfaceProperties(Class<?> intf) {

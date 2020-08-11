@@ -18,7 +18,6 @@ package io.jmix.core.impl.importexport;
 
 import io.jmix.core.*;
 import io.jmix.core.entity.EntityEntrySoftDelete;
-import io.jmix.core.AccessConstraintsRegistry;
 import io.jmix.core.entity.EntityValues;
 import io.jmix.core.entity.SecurityState;
 import io.jmix.core.metamodel.model.MetaClass;
@@ -665,7 +664,7 @@ public class EntityImportExportImpl implements EntityImportExport {
      * properties defined in the import view.
      */
     protected FetchPlan buildViewFromImportView(EntityImportView importView) {
-        FetchPlan regularView = new FetchPlan(importView.getEntityClass());
+        FetchPlan regularView = new FetchPlan(importView.getEntityClass()).addSystemProperties();//todo taimanov rework FetchPlan, return builder
         MetaClass metaClass = metadata.getClass(importView.getEntityClass());
         for (EntityImportViewProperty importViewProperty : importView.getProperties()) {
             EntityImportView importViewPropertyView = importViewProperty.getView();
@@ -674,7 +673,7 @@ public class EntityImportExportImpl implements EntityImportExport {
                 if (metaProperty.isReadOnly()) continue;
                 if (metaProperty.getRange().isClass()) {
                     MetaClass propertyMetaClass = metaProperty.getRange().asClass();
-                    regularView.addProperty(importViewProperty.getName(), new FetchPlan(propertyMetaClass.getJavaClass(), false));
+                    regularView.addProperty(importViewProperty.getName(), new FetchPlan(propertyMetaClass.getJavaClass()));
                 } else {
                     regularView.addProperty(importViewProperty.getName());
                 }
@@ -734,7 +733,7 @@ public class EntityImportExportImpl implements EntityImportExport {
         if (result == null) {
             LoadContext<? extends JmixEntity> ctx = new LoadContext(metadata.getClass(entity.getClass()))
                     .setSoftDeletion(false)
-                    .setFetchPlan(new FetchPlan(metadata.getClass(entity).getJavaClass(), false))
+                    .setFetchPlan(new FetchPlan(metadata.getClass(entity).getJavaClass()))
                     .setId(EntityValues.getId(entity));
             result = dataManager.load(ctx);
             if (result == null) {
