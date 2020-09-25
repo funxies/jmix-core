@@ -16,18 +16,14 @@
 
 package io.jmix.core.impl;
 
-import io.jmix.core.EntityInitializer;
-import io.jmix.core.Metadata;
-import io.jmix.core.MetadataTools;
-import io.jmix.core.JmixEntity;
+import io.jmix.core.*;
 import io.jmix.core.entity.EntityValues;
 import io.jmix.core.entity.annotation.EmbeddedParameters;
 import io.jmix.core.metamodel.model.MetaClass;
 import io.jmix.core.metamodel.model.MetaProperty;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
-
-import org.springframework.beans.factory.annotation.Autowired;
 
 @Component(EntityEmbeddedInitializer.NAME)
 public class EntityEmbeddedInitializer implements EntityInitializer, Ordered {
@@ -55,6 +51,6 @@ public class EntityEmbeddedInitializer implements EntityInitializer, Ordered {
 
     @Override
     public int getOrder() {
-        return HIGHEST_PLATFORM_PRECEDENCE + 20;
+        return JmixOrder.HIGHEST_PRECEDENCE + 20;
     }
 }
