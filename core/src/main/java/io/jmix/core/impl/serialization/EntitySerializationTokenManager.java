@@ -84,7 +84,7 @@ public class EntitySerializationTokenManager {
         if (!metadataTools.hasCompositePrimaryKey(metaClass)) {
             addSingleId(tokenObject, ENTITY_ID_KEY, EntityValues.getId(entity));
         }
-        if (securityState.getErasedData() != null) {//хранится то, что не доступно для текущей роли
+        if (securityState.getErasedData() != null) {
             securityState.getErasedData().asMap().forEach((k, v) -> addCollectionId(tokenObject, k, v));
         }
         try {
