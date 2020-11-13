@@ -37,7 +37,7 @@ public class PropertyConditionUtils {
      */
     public static String generateParameterName(PropertyCondition propertyCondition) {
         String property = !Strings.isNullOrEmpty(propertyCondition.getProperty()) ? propertyCondition.getProperty() : "";
-        return property + RandomStringUtils.randomAlphabetic(8);
+        return (property + RandomStringUtils.randomAlphabetic(8)).replace(".", "_");
     }
 
 }
