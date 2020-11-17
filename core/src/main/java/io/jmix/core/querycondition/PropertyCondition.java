@@ -167,7 +167,7 @@ public class PropertyCondition implements Condition {
     }
 
     @Override
-    public Condition copy() {
+    public PropertyCondition copy() {
         PropertyCondition pc = new PropertyCondition();
         pc.setProperty(this.property);
         pc.setOperation(this.operation);
