@@ -53,7 +53,7 @@ public class PropertyCondition implements Condition {
         pc.property = property;
         pc.operation = operation;
         pc.parameterValue = parameterValue;
-        pc.parameterName = PropertyConditionUtils.generateParameterName(pc);
+        pc.parameterName = PropertyConditionUtils.generateParameterName(property);
         return pc;
     }
 
