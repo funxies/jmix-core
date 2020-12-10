@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Haulmont.
+ * Copyright 2020 Haulmont.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,10 @@
  * limitations under the License.
  */
 
-package io.jmix.core.security;
+package io.jmix.core.datastore;
 
-import org.springframework.security.core.Authentication;
+import io.jmix.core.DataStore;
 
-/**
- * Interface that represents a set of credentials for authentication subsystem.
- */
-public interface Credentials extends Authentication {
-
+public interface DataStoreCustomizer {
+    void customize(DataStore dataStore);
 }

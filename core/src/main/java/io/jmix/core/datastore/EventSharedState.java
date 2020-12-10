@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-package io.jmix.core.security;
+package io.jmix.core.datastore;
 
-import org.springframework.security.core.Authentication;
+import javax.annotation.Nullable;
+import java.util.HashMap;
+import java.util.Map;
 
-/**
- * Strategy for accessing root authentication from wrapped authentication in the current security context.
- */
-public interface AuthenticationResolver {
-    /**
-     * @return true if resolving strategy supports authentication from the current security context
-     */
-    boolean supports(Authentication authentication);
+public class EventSharedState {
+    protected final Map<String, Object> values = new HashMap<>();
 
-    /**
-     * Resolve root authentication from the authentication
-     */
-    Authentication resolveAuthentication(Authentication authentication);
+    public void setValue(String key, Object value) {
+        values.put(key, value);
+    }
+
+    @Nullable
+    public Object getValue(String key) {
+        return values.get(key);
+    }
 }

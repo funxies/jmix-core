@@ -17,14 +17,14 @@
 package security
 
 import io.jmix.core.CoreConfiguration
-import io.jmix.core.entity.BaseUser
+import io.jmix.core.security.InMemoryUserRepository
 import io.jmix.core.security.SystemAuthenticationToken
 import io.jmix.core.security.impl.AuthenticatorImpl
-import io.jmix.core.security.impl.CoreUser
-import io.jmix.core.security.InMemoryUserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.userdetails.User
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.test.context.ContextConfiguration
 import spock.lang.Specification
 import test_support.base.TestBaseConfiguration
@@ -38,10 +38,14 @@ class AuthenticatorTest extends Specification {
     @Autowired
     InMemoryUserRepository userRepository
 
-    CoreUser admin
+    UserDetails admin
 
     def setup() {
-        admin = new CoreUser('admin', '{noop}admin123', 'Admin')
+        admin = User.builder()
+                .username('admin')
+                .password('{noop}admin123')
+                .authorities(Collections.emptyList())
+                .build()
         userRepository.addUser(admin)
     }
 
@@ -59,8 +63,8 @@ class AuthenticatorTest extends Specification {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication()
         authentication instanceof SystemAuthenticationToken
-        authentication.principal instanceof BaseUser
-        ((BaseUser) authentication.principal).username == 'system'
+        authentication.principal instanceof UserDetails
+        ((UserDetails) authentication.principal).username == 'system'
 
         when:
 
@@ -80,8 +84,8 @@ class AuthenticatorTest extends Specification {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication()
         authentication instanceof SystemAuthenticationToken
-        authentication.principal instanceof BaseUser
-        ((BaseUser) authentication.principal).username == 'admin'
+        authentication.principal instanceof UserDetails
+        ((UserDetails) authentication.principal).username == 'admin'
 
         when:
 
@@ -102,8 +106,8 @@ class AuthenticatorTest extends Specification {
 
         Authentication outerAuth = SecurityContextHolder.getContext().getAuthentication()
         outerAuth instanceof SystemAuthenticationToken
-        outerAuth.principal instanceof BaseUser
-        ((BaseUser) outerAuth.principal).username == 'system'
+        outerAuth.principal instanceof UserDetails
+        ((UserDetails) outerAuth.principal).username == 'system'
 
         when: "inner auth"
 
@@ -113,8 +117,8 @@ class AuthenticatorTest extends Specification {
 
         Authentication innerAuth = SecurityContextHolder.getContext().getAuthentication()
         innerAuth instanceof SystemAuthenticationToken
-        innerAuth.principal instanceof BaseUser
-        ((BaseUser) innerAuth.principal).username == 'admin'
+        innerAuth.principal instanceof UserDetails
+        ((UserDetails) innerAuth.principal).username == 'admin'
 
         when: "end inner"
 
@@ -124,8 +128,8 @@ class AuthenticatorTest extends Specification {
 
         Authentication outerAuth1 = SecurityContextHolder.getContext().getAuthentication()
         outerAuth1 instanceof SystemAuthenticationToken
-        outerAuth1.principal instanceof BaseUser
-        ((BaseUser) outerAuth1.principal).username == 'system'
+        outerAuth1.principal instanceof UserDetails
+        ((UserDetails) outerAuth1.principal).username == 'system'
 
         when: "end outer"
 

@@ -14,21 +14,14 @@
  * limitations under the License.
  */
 
-package io.jmix.core.security;
+package io.jmix.core.datastore;
 
-import org.springframework.security.core.Authentication;
+import java.util.EventObject;
 
-/**
- * Strategy for accessing root authentication from wrapped authentication in the current security context.
- */
-public interface AuthenticationResolver {
-    /**
-     * @return true if resolving strategy supports authentication from the current security context
-     */
-    boolean supports(Authentication authentication);
+public abstract class BaseDataStoreEvent extends EventObject {
+    public BaseDataStoreEvent(Object source) {
+        super(source);
+    }
 
-    /**
-     * Resolve root authentication from the authentication
-     */
-    Authentication resolveAuthentication(Authentication authentication);
+    public abstract void applyBy(DataStoreInterceptor interceptor);
 }

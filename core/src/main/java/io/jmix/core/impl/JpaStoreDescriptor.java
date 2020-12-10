@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Haulmont.
+ * Copyright 2019 Haulmont.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,21 @@
  * limitations under the License.
  */
 
-package io.jmix.core.security.authentication;
+package io.jmix.core.impl;
 
-import io.jmix.core.entity.BaseUser;
-import org.springframework.security.core.Authentication;
+import io.jmix.core.metamodel.model.StoreDescriptor;
+import org.springframework.stereotype.Component;
 
-import java.util.Locale;
+@Component("core_JpaStoreDescriptor")
+public class JpaStoreDescriptor implements StoreDescriptor {
 
-public interface CoreAuthentication extends Authentication {
+    @Override
+    public String getBeanName() {
+        return "data_JpaDataStore";
+    }
 
-    Locale getLocale();
-
-    void setLocale(Locale locale);
-
-    //todo remove and use #getPrincipal ?
-    BaseUser getUser();
-
-    //todo
-    //TimeZone getTimeZone()
+    @Override
+    public boolean isPersistent() {
+        return true;
+    }
 }

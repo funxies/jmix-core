@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Haulmont.
+ * Copyright (c) 2008-2019 Haulmont.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,15 @@
 
 package io.jmix.core.metamodel.annotation;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
- * Specifies an entity attribute if {@link JmixEntity#annotatedPropertiesOnly()} is set to true. Also, can specify
- * additional parameters of the attribute.
+ * Container for {@link Ddl} annotations.
  */
-@Target({ElementType.METHOD, ElementType.FIELD})
+@Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface JmixProperty {
+@Inherited
+public @interface DdlByDbms {
 
-    /**
-     * Whether the attribute is required.
-     */
-    boolean mandatory() default false;
+    Ddl[] value();
 }

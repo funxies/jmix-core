@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Haulmont.
+ * Copyright 2020 Haulmont.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package io.jmix.core.entity;
+package io.jmix.core.datastore;
 
-import org.springframework.security.core.userdetails.UserDetails;
+public interface DataStoreInterceptor {
+    default void beforeEntityLoad(BeforeEntityLoadEvent event) {
+    }
 
-/**
- * Base class for users. If the project needs custom user class, it must implement this interface.
- */
-public interface BaseUser extends UserDetails {
+    default void entityLoaded(EntityLoadedEvent event) {
+    }
 
-    /**
-     * Returns a string that is used for displaying users in suggestion fields, lookups, etc.
-     */
-    String getDisplayName();
+    default void afterEntityLoad(AfterEntityLoadEvent event) {
+    }
 
+    default void beforeEntityCount(BeforeEntityCountEvent event) {
+    }
 }

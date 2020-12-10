@@ -31,6 +31,7 @@ public class ClientDetails implements Serializable {
     private String address;
     private String info;
     private String clientType;
+    private String sessionId;
 
     private ClientDetails() {
     }
@@ -59,12 +60,25 @@ public class ClientDetails implements Serializable {
         return clientType;
     }
 
+    public String getSessionId() {
+        return sessionId;
+    }
+
     public static class Builder {
         private ClientDetails obj;
 
         public Builder() {
             obj = new ClientDetails();
             obj.timeZone = TimeZone.getDefault();
+        }
+
+        public Builder of(ClientDetails clientDetails) {
+            return locale(clientDetails.getLocale())
+                    .timeZone(clientDetails.getTimeZone())
+                    .address(clientDetails.getAddress())
+                    .info(clientDetails.getInfo())
+                    .clientType(clientDetails.getClientType())
+                    .sessionId(clientDetails.getSessionId());
         }
 
         public Builder locale(Locale locale) {
@@ -89,6 +103,11 @@ public class ClientDetails implements Serializable {
 
         public Builder clientType(String clientType) {
             obj.clientType = clientType;
+            return this;
+        }
+
+        public Builder sessionId(String sessionId) {
+            obj.sessionId = sessionId;
             return this;
         }
 

@@ -16,25 +16,41 @@
 
 package io.jmix.core.security;
 
-import io.jmix.core.entity.BaseUser;
-import io.jmix.core.security.UserRepository;
-import io.jmix.core.security.impl.CoreUser;
+import org.springframework.security.core.CredentialsContainer;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class InMemoryUserRepository implements UserRepository {
 
-    protected CoreUser systemUser;
-    protected CoreUser anonymousUser;
-    protected List<BaseUser> users = new ArrayList<>();
+    protected UserDetails systemUser;
+    protected UserDetails anonymousUser;
+    protected List<UserDetails> users = new ArrayList<>();
 
     public InMemoryUserRepository() {
-        systemUser = new CoreUser("system", "{noop}", "System");
-        anonymousUser = new CoreUser("anonymous", "{noop}", "Anonymous");
+        systemUser = createSystemUser();
+        anonymousUser = createAnonymousUser();
+    }
+
+    protected UserDetails createSystemUser() {
+        return User.builder()
+                .username("system")
+                .password("{noop}")
+                .authorities(Collections.emptyList())
+                .build();
+    }
+
+    protected UserDetails createAnonymousUser() {
+        return User.builder()
+                .username("anonymous")
+                .password("{noop}")
+                .authorities(Collections.emptyList())
+                .build();
     }
 
     @Override
@@ -42,31 +58,40 @@ public class InMemoryUserRepository implements UserRepository {
         return users.stream()
                 .filter(user -> user.getUsername().equals(username))
                 .findAny()
+                .map(this::copyUserDetails)
                 .orElseThrow(() -> new UsernameNotFoundException("User '" + username + "' not found"));
     }
 
     @Override
-    public BaseUser getSystemUser() {
+    public UserDetails getSystemUser() {
         return systemUser;
     }
 
     @Override
-    public BaseUser getAnonymousUser() {
+    public UserDetails getAnonymousUser() {
         return anonymousUser;
     }
 
     @Override
-    public List<BaseUser> getByUsernameLike(String username) {
+    public List<UserDetails> getByUsernameLike(String username) {
         return users.stream()
                 .filter(user -> user.getUsername().contains(username))
                 .collect(Collectors.toList());
     }
 
-    public void addUser(BaseUser user) {
+    public void addUser(UserDetails user) {
         users.add(user);
     }
 
-    public void removeUser(BaseUser user) {
+    public void removeUser(UserDetails user) {
         users.remove(user);
+    }
+
+    protected UserDetails copyUserDetails(UserDetails userDetails) {
+        if (userDetails instanceof CredentialsContainer) {
+            return User.withUserDetails(userDetails).build();
+        } else {
+            return userDetails;
+        }
     }
 }

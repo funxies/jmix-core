@@ -16,19 +16,13 @@
 
 package io.jmix.core.security;
 
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+
+import java.util.Collection;
 
 /**
- * Strategy for accessing root authentication from wrapped authentication in the current security context.
+ * Provides the ability to store authorities on a {@link org.springframework.security.core.userdetails.UserDetails}
  */
-public interface AuthenticationResolver {
-    /**
-     * @return true if resolving strategy supports authentication from the current security context
-     */
-    boolean supports(Authentication authentication);
-
-    /**
-     * Resolve root authentication from the authentication
-     */
-    Authentication resolveAuthentication(Authentication authentication);
+public interface GrantedAuthorityContainer {
+    void setAuthorities(Collection<? extends GrantedAuthority> authorities);
 }

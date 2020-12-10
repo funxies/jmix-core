@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Haulmont.
+ * Copyright 2020 Haulmont.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,32 @@
  * limitations under the License.
  */
 
-package io.jmix.core.impl;
+package test_support.app.entity.no_id;
 
-import io.jmix.core.metamodel.model.StoreDescriptor;
-import org.springframework.stereotype.Component;
+import io.jmix.core.metamodel.annotation.InstanceName;
+import io.jmix.core.metamodel.annotation.JmixEntity;
 
-@Component("core_OrmStoreDescriptor")
-public class OrmStoreDescriptor implements StoreDescriptor {
+@JmixEntity(name = "test_NoIdFoo")
+public class NoIdFoo {
 
-    @Override
-    public String getBeanName() {
-        return "data_OrmDataStore";
+    @InstanceName
+    private String name;
+
+    private Integer value;
+
+    public String getName() {
+        return name;
     }
 
-    @Override
-    public boolean isPersistent() {
-        return true;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Integer getValue() {
+        return value;
+    }
+
+    public void setValue(Integer value) {
+        this.value = value;
     }
 }
