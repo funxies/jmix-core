@@ -16,9 +16,5 @@
 
 package io.jmix.core.security;
 
-import javax.annotation.Nullable;
-
-public interface UserManager {
-
-    void changePassword(@Nullable String userName, @Nullable String oldPassword, @Nullable String newPassword) throws PasswordNotMatchException;
+public class PasswordNotMatchException extends Exception {
 }
