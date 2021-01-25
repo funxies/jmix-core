@@ -26,13 +26,22 @@ package io.jmix.core;
 public interface FileStorageLocator {
 
     /**
-     * Returns the file storage with the given name.
+     * Returns the file storage with the given bean name.
      *
      * @param beanName file storage bean name
      * @return file storage
+     * @throws IllegalArgumentException if no file storage with the given bean name found
+     */
+    <T extends FileStorage> T getByBeanName(String beanName);
+
+    /**
+     * Returns the file storage with the given name determined by {@link FileStorage#getStorageName()}.
+     *
+     * @param fileStorageName file storage name
+     * @return file storage
      * @throws IllegalArgumentException if no file storage with the given name found
      */
-    <T extends FileStorage> T get(String beanName);
+    <T extends FileStorage> T getByStorageName(String fileStorageName);
 
     /**
      * Returns the default file storage of the application.

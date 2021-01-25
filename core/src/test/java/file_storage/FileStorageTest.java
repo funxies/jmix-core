@@ -17,6 +17,7 @@
 package file_storage;
 
 import com.google.common.io.ByteStreams;
+import io.jmix.core.FileRef;
 import io.jmix.core.FileStorage;
 import io.jmix.core.FileStorageLocator;
 import io.jmix.core.CoreConfiguration;
@@ -49,8 +50,7 @@ public class FileStorageTest {
 
     @Test
     void testSaveLoad() throws IOException {
-        URI ref = fileStorage.createReference("testfile");
-        fileStorage.saveStream(ref, new ByteArrayInputStream("some content".getBytes()));
+        FileRef ref = fileStorage.saveStream("testfile", new ByteArrayInputStream("some content".getBytes()));
 
         InputStream inputStream = fileStorage.openStream(ref);
 
@@ -60,21 +60,21 @@ public class FileStorageTest {
 
     @Test
     void testLocator() {
-        // usage with typed reference
-        FileStorage<URI> fs1 = fileStorageLocator.get("testFileStorage");
-        URI ref1 = fs1.createReference("testfile");
-        fs1.saveStream(ref1, new ByteArrayInputStream(new byte[0]));
-
-        // usage with untyped reference
-        FileStorage fs2 = fileStorageLocator.get("testFileStorage2");
-        Object ref2 = fs2.createReference("testfile");
-        //noinspection unchecked
-        fs2.saveStream(ref2, new ByteArrayInputStream(new byte[0]));
+        FileStorage fs1 = fileStorageLocator.getByBeanName("testFileStorage");
+        fs1.saveStream("testfile", new ByteArrayInputStream(new byte[0]));
 
         // usage with concrete storage type
-        TestFileStorage fsTest = fileStorageLocator.getDefault();
-        URI refTest = fsTest.createReference("testfile");
-        fsTest.saveStream(refTest, new ByteArrayInputStream(new byte[0]));
+        TestFileStorage fs2 = fileStorageLocator.getByBeanName("testFileStorage2");
+        fs2.saveStream("testfile", new ByteArrayInputStream(new byte[0]));
+
+        // get file storage by storage name
+        TestFileStorage fs2test = fileStorageLocator.getByStorageName("testFs");
+
+        assertSame(fs2, fs2test);
+
+        //usage with default storage
+        FileStorage fsTest = fileStorageLocator.getDefault();
+        fsTest.saveStream("testfile", new ByteArrayInputStream(new byte[0]));
 
         assertSame(fs1, fsTest);
     }

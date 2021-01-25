@@ -29,7 +29,7 @@ public class TestAppConfiguration {
 
     @Bean
     TestFileStorage testFileStorage2() {
-        return new TestFileStorage();
+        return new TestFileStorage("testFs");
     }
 
     @Bean

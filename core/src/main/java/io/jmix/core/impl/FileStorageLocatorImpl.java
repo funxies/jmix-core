@@ -22,23 +22,50 @@ import io.jmix.core.FileStorageLocator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Component
 public class FileStorageLocatorImpl implements FileStorageLocator {
 
     @Autowired(required = false)
-    private Map<String, FileStorage> storages = Collections.emptyMap();
+    private Map<String, FileStorage> storagesByBeanNames = Collections.emptyMap();
+
+    private Map<String, FileStorage> storagesByNames;
 
     @Autowired
     private CoreProperties properties;
 
+    @PostConstruct
+    protected void initStoragesByNames() {
+        if (storagesByBeanNames.isEmpty()) {
+            storagesByNames = Collections.emptyMap();
+        } else {
+            storagesByNames = storagesByBeanNames.values().stream()
+                    .collect(Collectors.toMap(FileStorage::getStorageName, Function.identity(),
+                            (fileStorage, fileStorageWithTheSameName) -> fileStorage));
+        }
+    }
+
     @Override
-    public <T extends FileStorage> T get(String beanName) {
-        FileStorage fileStorage = storages.get(beanName);
+    public <T extends FileStorage> T getByBeanName(String beanName) {
+        FileStorage fileStorage = storagesByBeanNames.get(beanName);
         if (fileStorage == null) {
-            throw new IllegalArgumentException(beanName);
+            throw new IllegalArgumentException("FileStorage not found: " + beanName);
+        }
+        //noinspection unchecked
+        return (T) fileStorage;
+    }
+
+    @Override
+    public <T extends FileStorage> T getByStorageName(String fileStorageName) {
+        FileStorage fileStorage = storagesByNames.get(fileStorageName);
+        if (fileStorage == null) {
+            throw new IllegalArgumentException("FileStorage not found: " + fileStorageName);
         }
         //noinspection unchecked
         return (T) fileStorage;
@@ -48,12 +75,12 @@ public class FileStorageLocatorImpl implements FileStorageLocator {
     public <T extends FileStorage> T getDefault() {
         String defaultFileStorage = properties.getDefaultFileStorage();
         if (defaultFileStorage != null) {
-            return get(defaultFileStorage);
+            return getByBeanName(defaultFileStorage);
         } else {
-            if (storages.size() == 1) {
+            if (storagesByBeanNames.size() == 1) {
                 //noinspection unchecked
-                return (T) storages.values().iterator().next();
-            } else if (storages.isEmpty()) {
+                return (T) storagesByBeanNames.values().iterator().next();
+            } else if (storagesByBeanNames.isEmpty()) {
                 throw new IllegalStateException("No FileStorage beans registered");
             } else {
                 throw new IllegalStateException("There are more than one FileStorage beans registered, " +
