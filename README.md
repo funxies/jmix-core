@@ -34,7 +34,7 @@
 ## Description
 Jmix is a set of libraries and tools to speed up Spring Boot data-centric application development. Jmix provides a lot of ready-to-use functionality out of the box. You can plug in advanced system functionality like complex data security and audit as well as business functionality like reporting or business process execution engine in a few lines of code.
 
-## Using Jnix
+## Using Jmix
 To get started, [download Jmix Studio](https://www.jmix.io/tools) - a plugin for IntelliJ IDEA. It helps you at all stages of the application development: creating and configuring a project, defining data model, generating database migration scripts, developing UI screens in a visual editor. It provides advanced navigation, code completion and inspections specific to Jmix projects.
 
 <p>
